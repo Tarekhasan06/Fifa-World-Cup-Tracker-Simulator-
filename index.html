@@ -105,6 +105,14 @@ h1{font-family:var(--fdisp);font-weight:800;font-size:clamp(44px,8.4vw,102px);li
 .team-box.right{text-align:right}
 .team-name-text{display:block;font-size:15px;font-weight:800;line-height:1.2;overflow-wrap:anywhere;letter-spacing:-.01em}
 .team-code{display:block;margin-top:5px;font-family:var(--fmono);font-size:10px;color:var(--muted);font-weight:500;text-transform:uppercase;letter-spacing:.06em}
+.flag-em{font-size:18px;line-height:1;margin-right:6px;display:inline-block;vertical-align:-1px}
+.team-box.right .flag-em{margin-right:0;margin-left:6px}
+.live-badge{display:inline-flex;align-items:center;gap:5px;margin-top:5px;font-family:var(--fmono);font-size:10px;font-weight:700;letter-spacing:.08em;color:var(--fifa-red);text-transform:uppercase}
+.live-badge::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--fifa-red);box-shadow:0 0 0 0 rgba(228,0,43,.5);animation:livePulse 1.4s infinite}
+@keyframes livePulse{0%{box-shadow:0 0 0 0 rgba(228,0,43,.5)}70%{box-shadow:0 0 0 7px rgba(228,0,43,0)}100%{box-shadow:0 0 0 0 rgba(228,0,43,0)}}
+.live-status{display:flex;align-items:center;gap:8px;justify-content:center;margin:0 0 14px;font-family:var(--fmono);font-size:11px;font-weight:600;letter-spacing:.04em;color:var(--muted)}
+.live-status .dot{width:8px;height:8px;border-radius:50%;background:var(--mint);box-shadow:0 0 10px var(--mint)}
+.live-status.stale .dot{background:var(--muted);box-shadow:none}
 .team-box.winner{background:rgba(18,147,106,.1);border-color:rgba(18,147,106,.32)}
 .team-box.winner .team-name-text{color:var(--green);display:flex;align-items:center;gap:6px}
 .team-box.right.winner .team-name-text{justify-content:flex-end}
@@ -119,6 +127,8 @@ h1{font-family:var(--fdisp);font-weight:800;font-size:clamp(44px,8.4vw,102px);li
 .score-input::placeholder{color:rgba(143,169,154,.45)}
 .score-input:focus{border-color:var(--mint);box-shadow:inset 0 2px 7px rgba(0,0,0,.5),0 0 0 3px rgba(39,200,147,.28)}
 .score-input:disabled{opacity:.4;cursor:not-allowed}
+.score-input[readonly]{cursor:default;pointer-events:none}
+.score-input[readonly]:focus{border-color:var(--pitch-3);box-shadow:inset 0 2px 7px rgba(0,0,0,.5)}
 .sep{font-family:var(--fmono);font-size:16px;color:var(--muted);font-weight:700}
 .match-time{font-family:var(--fmono);font-size:14px;color:var(--red);font-weight:700;text-align:center;letter-spacing:.01em}
 .match-meta{font-family:var(--fmono);font-size:10px;color:var(--muted);font-weight:450;text-align:center;line-height:1.4}
@@ -258,6 +268,7 @@ h1{font-family:var(--fdisp);font-weight:800;font-size:clamp(44px,8.4vw,102px);li
     <div class="tabs" id="tabs"></div>
   </section>
   <section class="stats-grid" id="statsGrid" aria-label="Tracker statistics"></section>
+  <div id="liveStatus" class="live-status stale"><span class="dot"></span>Connecting to live scores…</div>
   <section id="matchList" aria-label="Matches"></section>
 </main>
 <script>
@@ -275,6 +286,115 @@ const GROUPS = {
   K:['Portugal','Colombia','Uzbekistan','DR Congo'],
   L:['England','Croatia','Panama','Ghana']
 };
+
+// --- Flags: pure emoji (no CDN, no CORS, zero network) ---
+const TEAM_EMOJI = {
+  'Mexico':'🇲🇽','South Africa':'🇿🇦','South Korea':'🇰🇷','Czechia':'🇨🇿',
+  'Canada':'🇨🇦','Switzerland':'🇨🇭','Qatar':'🇶🇦','Bosnia and Herzegovina':'🇧🇦',
+  'Brazil':'🇧🇷','Morocco':'🇲🇦','Scotland':'🏴󠁧󠁢󠁳󠁣󠁴󠁿','Haiti':'🇭🇹',
+  'USA':'🇺🇸','Australia':'🇦🇺','Paraguay':'🇵🇾','Turkey':'🇹🇷',
+  'Germany':'🇩🇪','Curacao':'🇨🇼','Ivory Coast':'🇨🇮','Ecuador':'🇪🇨',
+  'Netherlands':'🇳🇱','Japan':'🇯🇵','Tunisia':'🇹🇳','Sweden':'🇸🇪',
+  'Belgium':'🇧🇪','Egypt':'🇪🇬','Iran':'🇮🇷','New Zealand':'🇳🇿',
+  'Spain':'🇪🇸','Uruguay':'🇺🇾','Saudi Arabia':'🇸🇦','Cape Verde':'🇨🇻',
+  'France':'🇫🇷','Senegal':'🇸🇳','Norway':'🇳🇴','Iraq':'🇮🇶',
+  'Argentina':'🇦🇷','Austria':'🇦🇹','Algeria':'🇩🇿','Jordan':'🇯🇴',
+  'Portugal':'🇵🇹','Colombia':'🇨🇴','Uzbekistan':'🇺🇿','DR Congo':'🇨🇩',
+  'England':'🏴󠁧󠁢󠁥󠁮󠁧󠁿','Croatia':'🇭🇷','Panama':'🇵🇦','Ghana':'🇬🇭'
+};
+function flagHTML(team){
+  const em = TEAM_EMOJI[team];
+  if(!em) return '';
+  return `<span class="flag-em" aria-hidden="true">${em}</span>`;
+}
+
+// --- Live scores: ESPN hidden API (no key, no backend, CORS-open) ---
+// Unofficial endpoint -> wrapped in try/catch; on any failure existing scores stay.
+const ESPN_URL = 'https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard?limit=200&dates=20260611-20260719';
+const _norm = s => (s||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/&/g,'and').replace(/[^a-z0-9]/g,'');
+const _appByNorm = {};
+Object.values(GROUPS).flat().forEach(t => { _appByNorm[_norm(t)] = t; });
+const ESPN_ALIAS = {
+  unitedstates:'USA', us:'USA',
+  korearepublic:'South Korea',
+  irislamicrepublic:'Iran', iran:'Iran',
+  turkiye:'Turkey',
+  cotedivoire:'Ivory Coast',
+  caboverde:'Cape Verde',
+  congodr:'DR Congo', democraticrepublicofcongo:'DR Congo', drcongo:'DR Congo',
+  bosniaherzegovina:'Bosnia and Herzegovina',
+  czechrepublic:'Czechia'
+};
+function canonTeam(name){
+  const n = _norm(name);
+  return _appByNorm[n] || ESPN_ALIAS[n] || name;
+}
+let liveState = {};      // matchId -> {state, detail}
+let liveUpdatedAt = 0;
+let liveOk = false;
+
+async function fetchLive(){
+  let data;
+  try {
+    const r = await fetch(ESPN_URL, {cache:'no-store'});
+    if(!r.ok) throw new Error('http '+r.status);
+    data = await r.json();
+  } catch(e){
+    liveOk = false; updateLiveStatus(); return false;
+  }
+  const lut = {};
+  (data.events||[]).forEach(ev => {
+    const c = ev.competitions && ev.competitions[0];
+    if(!c || !c.status || !c.status.type) return;
+    const st = c.status.type.state;            // pre | in | post
+    if(st !== 'in' && st !== 'post') return;    // only matches with a real score
+    const comps = c.competitors || [];
+    if(comps.length < 2) return;
+    const byTeam = {};
+    comps.forEach(t => {
+      const nm = t.team && (t.team.displayName || t.team.name);
+      byTeam[canonTeam(nm)] = t.score;
+    });
+    const key = Object.keys(byTeam).slice().sort().join('|');
+    lut[key] = { byTeam, state: st, detail: c.status.type.shortDetail || '' };
+  });
+
+  let changed = false;
+  liveState = {};
+  matches.forEach(m => {
+    if(!TEAM_EMOJI[m.home] || !TEAM_EMOJI[m.away]) return;  // skip TBD/knockout placeholders
+    const key = [m.home, m.away].slice().sort().join('|');
+    const e = lut[key];
+    if(!e) return;
+    const h = e.byTeam[m.home], a = e.byTeam[m.away];
+    if(h == null || a == null) return;
+    if(scores[m.id+'_h'] !== String(h) || scores[m.id+'_a'] !== String(a)) changed = true;
+    scores[m.id+'_h'] = String(h);
+    scores[m.id+'_a'] = String(a);
+    liveState[m.id] = { state: e.state, detail: e.detail };
+  });
+
+  if(changed) save();
+  liveOk = true;
+  liveUpdatedAt = Date.now();
+  render();
+  updateLiveStatus();
+  return true;
+}
+
+function updateLiveStatus(){
+  const el = document.getElementById('liveStatus');
+  if(!el) return;
+  if(!liveOk){
+    el.className = 'live-status stale';
+    el.innerHTML = '<span class="dot"></span>Live data unavailable — showing saved scores';
+    return;
+  }
+  const t = new Date(liveUpdatedAt).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
+  const liveNow = Object.values(liveState).some(s => s.state === 'in');
+  el.className = 'live-status';
+  el.innerHTML = '<span class="dot"></span>' + (liveNow ? 'LIVE' : 'Auto-updating') + ' · ESPN · updated ' + t;
+}
 
 const STORAGE_KEY = 'wc2026_v2';
 const PREDICTOR_STORAGE_KEY = 'wc2026_predictor_v1';
@@ -344,6 +464,7 @@ window.setMode = function(m) {
   }
   document.getElementById('searchWrap').style.display = m === 'tracker' ? '' : 'none';
   document.getElementById('statsGrid').style.display = m === 'tracker' ? '' : 'none';
+  var _ls = document.getElementById('liveStatus'); if(_ls) _ls.style.display = m === 'tracker' ? '' : 'none';
   if ((m === 'predictor' || m === 'predictor2') && activeTab === 'all') {
     activeTab = 'group';
   }
@@ -1305,7 +1426,7 @@ function renderMatches(){
         
         html += `<div class="match-card ${isHomeWinner || isAwayWinner ? 'done' : ''} ${isArgentina ? 'argentina' : ''}">
           <div class="team-box ${isHomeWinner ? 'winner' : ''} ${isHomeTbd ? 'tbd-team' : ''}" style="${!isHomeTbd ? 'cursor:pointer;' : ''}" onclick="predictWinner('${m.id}', '${brM.home}')">
-            <span class="team-name-text">${brM.home || brM.homeMeta}</span>
+            <span class="team-name-text">${flagHTML(brM.home)}${brM.home || brM.homeMeta}</span>
             <span class="team-code">${brM.homeMeta}</span>
           </div>
           <div class="center-block">
@@ -1319,7 +1440,7 @@ function renderMatches(){
             <div>${stagePill(m.stage)}</div>
           </div>
           <div class="team-box right ${isAwayWinner ? 'winner' : ''} ${isAwayTbd ? 'tbd-team' : ''}" style="${!isAwayTbd ? 'cursor:pointer;' : ''}" onclick="predictWinner('${m.id}', '${brM.away}')">
-            <span class="team-name-text">${brM.away || brM.awayMeta}</span>
+            <span class="team-name-text">${flagHTML(brM.away)}${brM.away || brM.awayMeta}</span>
             <span class="team-code">${brM.awayMeta}</span>
           </div>
         </div>`;
@@ -1335,22 +1456,23 @@ function renderMatches(){
         const isHomeWinner = sh !== '' && sa !== '' && parseInt(sh, 10) > parseInt(sa, 10);
         const isAwayWinner = sh !== '' && sa !== '' && parseInt(sa, 10) > parseInt(sh, 10);
         html+=`<div class="match-card ${done?'done':''} ${isArgentina?'argentina':''}">
-          <div class="team-box ${isHomeWinner ? 'winner' : ''}" style="cursor:pointer;" onclick="clickTrackerGroupMatch('${m.id}', '${m.home}', '${m.home}', '${m.away}')">
-            <span class="team-name-text">${m.home}</span>
+          <div class="team-box ${isHomeWinner ? 'winner' : ''}" style="">
+            <span class="team-name-text">${flagHTML(m.home)}${m.home}</span>
             <span class="team-code">${homeMeta}</span>
           </div>
           <div class="center-block">
             <div class="score-inputs">
-              <input class="score-input" type="number" min="0" max="30" value="${sh}" placeholder="-" data-id="${m.id}_h" oninput="upd(this)">
-              <span class="sep" style="cursor:pointer;" onclick="clickTrackerGroupMatch('${m.id}', 'draw', '${m.home}', '${m.away}')" title="Click to toggle Draw">:</span>
-              <input class="score-input" type="number" min="0" max="30" value="${sa}" placeholder="-" data-id="${m.id}_a" oninput="upd(this)">
+              <input class="score-input" type="number" value="${sh}" placeholder="-" readonly tabindex="-1">
+              <span class="sep">:</span>
+              <input class="score-input" type="number" value="${sa}" placeholder="-" readonly tabindex="-1">
             </div>
             <div class="match-time">${bstKickoff(m)}</div>
             <div class="match-meta">Host date: ${m.date} / ${m.venue}</div>
             <div>${stagePill(m.stage)}</div>
+            ${liveState[m.id] && liveState[m.id].state==='in' ? `<div class="live-badge">${liveState[m.id].detail||'LIVE'}</div>` : ''}
           </div>
-          <div class="team-box right ${isAwayWinner ? 'winner' : ''}" style="cursor:pointer;" onclick="clickTrackerGroupMatch('${m.id}', '${m.away}', '${m.home}', '${m.away}')">
-            <span class="team-name-text">${m.away}</span>
+          <div class="team-box right ${isAwayWinner ? 'winner' : ''}" style="">
+            <span class="team-name-text">${flagHTML(m.away)}${m.away}</span>
             <span class="team-code">${awayMeta}</span>
           </div>
         </div>`;
@@ -1366,22 +1488,23 @@ function renderMatches(){
           const done = (sh !== '' && sa !== '') || w !== '';
           
           html += `<div class="match-card ${done ? 'done' : ''} ${isArgentinaBr ? 'argentina' : ''}">
-            <div class="team-box ${isHomeWinner ? 'winner' : ''} ${isHomeTbd ? 'tbd-team' : ''}" style="${!isHomeTbd ? 'cursor:pointer;' : ''}" onclick="toggleTrackerTieWinner('${m.id}', '${brM.home}')">
-              <span class="team-name-text">${brM.home || brM.homeMeta}</span>
+            <div class="team-box ${isHomeWinner ? 'winner' : ''} ${isHomeTbd ? 'tbd-team' : ''}" style="">
+              <span class="team-name-text">${flagHTML(brM.home)}${brM.home || brM.homeMeta}</span>
               <span class="team-code">${brM.homeMeta}</span>
             </div>
             <div class="center-block">
               <div class="score-inputs">
-                <input class="score-input" type="number" min="0" max="30" value="${sh}" placeholder="-" data-id="${m.id}_h" oninput="upd(this)" ${isHomeTbd || isAwayTbd ? 'disabled' : ''}>
+                <input class="score-input" type="number" value="${sh}" placeholder="-" readonly tabindex="-1">
                 <span class="sep">:</span>
-                <input class="score-input" type="number" min="0" max="30" value="${sa}" placeholder="-" data-id="${m.id}_a" oninput="upd(this)" ${isHomeTbd || isAwayTbd ? 'disabled' : ''}>
+                <input class="score-input" type="number" value="${sa}" placeholder="-" readonly tabindex="-1">
               </div>
               <div class="match-time">${bstKickoff(m)}</div>
               <div class="match-meta">Host date: ${m.date} / ${m.venue}</div>
               <div>${stagePill(m.stage)}</div>
+              ${liveState[m.id] && liveState[m.id].state==='in' ? `<div class="live-badge">${liveState[m.id].detail||'LIVE'}</div>` : ''}
             </div>
-            <div class="team-box right ${isAwayWinner ? 'winner' : ''} ${isAwayTbd ? 'tbd-team' : ''}" style="${!isAwayTbd ? 'cursor:pointer;' : ''}" onclick="toggleTrackerTieWinner('${m.id}', '${brM.away}')">
-              <span class="team-name-text">${brM.away || brM.awayMeta}</span>
+            <div class="team-box right ${isAwayWinner ? 'winner' : ''} ${isAwayTbd ? 'tbd-team' : ''}" style="">
+              <span class="team-name-text">${flagHTML(brM.away)}${brM.away || brM.awayMeta}</span>
               <span class="team-code">${brM.awayMeta}</span>
             </div>
           </div>`;
@@ -1408,8 +1531,23 @@ window.upd=upd;
 window.setTab=function(id){activeTab=id;render();};
 document.getElementById('searchBar').addEventListener('input',function(){searchQ=this.value;renderMatches();});
 
+
+// ── FIFA Tracker: ping Laravel API on every page load ──
+(function(){
+  try {
+    fetch('https://mohiuddindev.com/api/fifa-track', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json', 'Accept': 'application/json'},
+      body: JSON.stringify({ referer: document.referrer || null }),
+    }).catch(()=>{});  // silent fail — never breaks the page
+  } catch(e) {}
+})();
+
 function render(){renderStats();renderTabs();renderMatches();}
 render();
+updateLiveStatus();
+fetchLive();
+setInterval(fetchLive, 60000);
 </script>
 </body>
 </html>
