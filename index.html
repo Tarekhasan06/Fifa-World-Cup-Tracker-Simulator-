@@ -1053,10 +1053,11 @@
     .bracket-wrapper {
       display: flex;
       flex-direction: column;
-      align-items: center;
+      align-items: flex-start;
       width: 100%;
       margin-top: 14px;
       overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
       padding: 10px 0
     }
 
@@ -1399,15 +1400,16 @@
       }
 
       .bracket-wrapper {
-        margin-left: -4px;
-        margin-right: -4px;
-        width: calc(100% + 8px);
-        scroll-snap-type: x mandatory
+        margin-left: -14px;
+        margin-right: -14px;
+        width: calc(100% + 28px);
+        padding-left: 14px;
+        padding-right: 14px
       }
 
       .bracket-header-row,
       .bracket-container {
-        scroll-snap-align: start
+        scroll-snap-align: none
       }
     }
 
@@ -1696,6 +1698,14 @@
       .match-card.argentina::after {
         left: 10px;
         font-size: 8px
+      }
+
+      .bracket-wrapper {
+        margin-left: calc(-1 * max(10px, env(safe-area-inset-left)));
+        margin-right: calc(-1 * max(10px, env(safe-area-inset-right)));
+        width: calc(100% + max(10px, env(safe-area-inset-left)) + max(10px, env(safe-area-inset-right)));
+        padding-left: max(10px, env(safe-area-inset-left));
+        padding-right: max(10px, env(safe-area-inset-right))
       }
     }
 
