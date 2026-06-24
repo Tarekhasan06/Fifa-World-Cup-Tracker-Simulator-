@@ -1737,6 +1737,236 @@
         transform: none
       }
     }
+
+    /* ── GROUP STANDINGS TABLE ── */
+    #standingsSection {
+      margin-bottom: 22px
+    }
+
+    .standings-shell {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      box-shadow: var(--shadow-sm);
+      overflow: hidden
+    }
+
+    .standings-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 14px 16px 12px;
+      border-bottom: 1px solid var(--line);
+      background: var(--soft)
+    }
+
+    .standings-nav-btn {
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      border: 1.5px solid var(--line);
+      background: var(--panel);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: .18s;
+      color: var(--ink);
+      flex-shrink: 0;
+      font-size: 15px
+    }
+
+    .standings-nav-btn:hover {
+      background: var(--green);
+      color: #fff;
+      border-color: var(--green);
+      transform: scale(1.08)
+    }
+
+    .standings-nav-btn:disabled {
+      opacity: .3;
+      cursor: not-allowed;
+      transform: none
+    }
+
+    .standings-title-block {
+      flex: 1;
+      text-align: center
+    }
+
+    .standings-group-name {
+      font-size: 18px;
+      font-weight: 900;
+      letter-spacing: -.01em
+    }
+
+    .standings-group-teams {
+      font-size: 11px;
+      color: var(--muted);
+      font-weight: 500;
+      margin-top: 1px
+    }
+
+    .standings-dots {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 5px;
+      padding: 10px 16px 12px
+    }
+
+    .standings-dot {
+      height: 6px;
+      border-radius: 99px;
+      background: var(--line);
+      cursor: pointer;
+      transition: .2s;
+      width: 6px
+    }
+
+    .standings-dot.active {
+      background: var(--green);
+      width: 20px
+    }
+
+    .standings-dot:hover:not(.active) {
+      background: var(--muted)
+    }
+
+    .standings-table {
+      width: 100%;
+      border-collapse: collapse
+    }
+
+    .standings-table th {
+      padding: 8px 6px;
+      text-align: center;
+      font-size: 9.5px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: .07em;
+      color: var(--muted);
+      white-space: nowrap
+    }
+
+    .standings-table th.th-team {
+      text-align: left;
+      padding-left: 14px
+    }
+
+    .standings-table td {
+      padding: 9px 6px;
+      text-align: center;
+      font-size: 12.5px;
+      font-weight: 600;
+      color: var(--ink);
+      border-top: 1px solid var(--line)
+    }
+
+    .standings-table tr:first-child td {
+      border-top: none
+    }
+
+    .standings-table td.td-team {
+      text-align: left;
+      padding-left: 10px
+    }
+
+    .standings-table tr.zone-q1 td,
+    .standings-table tr.zone-q2 td {
+      background: rgba(18,147,106,.045)
+    }
+
+    .standings-table tr.zone-q3 td {
+      background: rgba(221,160,23,.05)
+    }
+
+    .standings-table tr.zone-elim td {
+      background: rgba(255,106,61,.04)
+    }
+
+    .spos {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 21px;
+      height: 21px;
+      border-radius: 6px;
+      font-size: 11px;
+      font-weight: 800
+    }
+
+    .spos-1, .spos-2 {
+      background: rgba(18,147,106,.18);
+      color: var(--green)
+    }
+
+    .spos-3 {
+      background: rgba(221,160,23,.18);
+      color: var(--gold)
+    }
+
+    .spos-4 {
+      background: rgba(255,106,61,.13);
+      color: var(--red)
+    }
+
+    .s-team-cell {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      font-weight: 700;
+      font-size: 12.5px;
+      white-space: nowrap
+    }
+
+    .s-pts {
+      font-weight: 900;
+      font-size: 14px
+    }
+
+    .s-gd {
+      font-weight: 700;
+      font-size: 12px
+    }
+
+    .s-gd.pos { color: var(--green) }
+    .s-gd.neg { color: var(--red) }
+
+    .standings-legend {
+      display: flex;
+      gap: 14px;
+      padding: 9px 14px;
+      border-top: 1px solid var(--line);
+      background: var(--soft)
+    }
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 10px;
+      font-weight: 600;
+      color: var(--muted)
+    }
+
+    .legend-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 2px
+    }
+
+    .legend-dot.q { background: rgba(18,147,106,.5) }
+    .legend-dot.m { background: rgba(221,160,23,.5) }
+    .legend-dot.e { background: rgba(255,106,61,.4) }
+
+    @media (max-width: 560px) {
+      .standings-group-name { font-size: 16px }
+      .standings-table th, .standings-table td { padding: 7px 4px; font-size: 11.5px }
+      .standings-table th.th-team, .standings-table td.td-team { padding-left: 8px }
+      .s-team-cell { font-size: 11.5px; gap: 5px }
+      .s-pts { font-size: 13px }
+    }
   </style>
 </head>
 
@@ -1774,6 +2004,7 @@
     </section>
     <section class="stats-grid" id="statsGrid" aria-label="Tracker statistics"></section>
     <div id="liveStatus" class="live-status stale"><span class="dot"></span>Connecting to live scores…</div>
+    <div id="standingsSection" aria-label="Group standings"></div>
     <section id="matchList" aria-label="Matches"></section>
   </main>
   <script>
@@ -2591,43 +2822,48 @@
       document.getElementById('matchList').innerHTML = html;
     }
 
-    // Assign 8 best 3rd-place teams to R32 slots avoiding same-group matchups.
-    // Each slot has a "forbidden" group (the group whose own 1st/2nd is already in that slot).
-    // We greedily assign the best available 3rd-place team to each slot while respecting that constraint.
+    // Assign 8 best 3rd-place teams to R32 slots using the OFFICIAL FIFA WC 2026 combination table.
+    // Each slot only accepts 3rd-place teams from the specific groups listed in FIFA's official bracket.
+    // Source: FIFA official bracket (M74, M77, M79, M80, M81, M82, M85, M87)
+    // Uses backtracking to respect the allowed-groups constraint strictly — same-group teams
+    // (e.g. Portugal/Colombia/DR Congo from Group K) will NEVER be forced into the same R32 match.
     function assign3rdToSlots(selectedGroups, pMap) {
-      // Slots that feature a 3rd-place team, paired with the group(s) that CANNOT be assigned there.
-      // Forbidden = the group of the known opponent in that match.
       const slots = [
-        { id: 'r3',  forbidden: ['E'] },   // E1 vs 3rd
-        { id: 'r6',  forbidden: ['I'] },   // I1 vs 3rd
-        { id: 'r7',  forbidden: ['A'] },   // A1 vs 3rd
-        { id: 'r8',  forbidden: ['L'] },   // L1 vs 3rd
-        { id: 'r9',  forbidden: ['G'] },   // G1 vs 3rd
-        { id: 'r10', forbidden: ['D'] },   // D1 vs 3rd
-        { id: 'r13', forbidden: ['B'] },   // B1 vs 3rd
-        { id: 'r16', forbidden: ['K'] },   // K1 vs 3rd
+        { id: 'r3',  allowed: ['A','B','C','D','F'] },   // M74: E1 vs 3rd A/B/C/D/F
+        { id: 'r6',  allowed: ['C','D','F','G','H'] },   // M77: I1 vs 3rd C/D/F/G/H
+        { id: 'r7',  allowed: ['C','E','F','H','I'] },   // M79: A1 vs 3rd C/E/F/H/I
+        { id: 'r8',  allowed: ['E','H','I','J','K'] },   // M80: L1 vs 3rd E/H/I/J/K
+        { id: 'r9',  allowed: ['A','E','H','I','J'] },   // M82: G1 vs 3rd A/E/H/I/J
+        { id: 'r10', allowed: ['B','E','F','I','J'] },   // M81: D1 vs 3rd B/E/F/I/J
+        { id: 'r13', allowed: ['E','F','G','I','J'] },   // M85: B1 vs 3rd E/F/G/I/J
+        { id: 'r16', allowed: ['D','E','I','J','L'] },   // M87: K1 vs 3rd D/E/I/J/L
       ];
 
-      const remaining = [...selectedGroups]; // groups sorted by ranking (best first)
       const result = {};
+      const usedGroups = new Set();
 
-      // First pass: assign best available non-forbidden group to each slot
-      for (const slot of slots) {
-        let assigned = false;
-        for (let i = 0; i < remaining.length; i++) {
-          if (!slot.forbidden.includes(remaining[i])) {
-            const g = remaining.splice(i, 1)[0];
+      // Backtracking: try to assign each slot a valid 3rd-place team (best-first).
+      // If no valid team fits a slot, leave it TBD — never force an out-of-allowed-groups team.
+      function backtrack(slotIdx) {
+        if (slotIdx === slots.length) return true;
+        const slot = slots[slotIdx];
+
+        for (const g of selectedGroups) {
+          if (!usedGroups.has(g) && slot.allowed.includes(g)) {
+            usedGroups.add(g);
             result[slot.id] = { group: g, team: pMap[g + '3'] || '' };
-            assigned = true;
-            break;
+            if (backtrack(slotIdx + 1)) return true;
+            // Backtrack if deeper assignment failed
+            usedGroups.delete(g);
+            delete result[slot.id];
           }
         }
-        if (!assigned) {
-          // Fallback: assign even if forbidden (shouldn't happen with 12 groups & 8 slots)
-          const g = remaining.length > 0 ? remaining.splice(0, 1)[0] : '';
-          result[slot.id] = { group: g, team: g ? (pMap[g + '3'] || '') : '' };
-        }
+        // No valid team for this slot — leave as TBD
+        result[slot.id] = { group: '', team: '' };
+        return backtrack(slotIdx + 1);
       }
+
+      backtrack(0);
       return result;
     }
 
@@ -2675,6 +2911,9 @@
         standings[g] = GROUPS[g].map(team => ({
           name: team,
           points: 0,
+          wins: 0,
+          draws: 0,
+          losses: 0,
           goalsFor: 0,
           goalsAgainst: 0,
           goalDiff: 0,
@@ -2700,11 +2939,17 @@
           awayTeam.goalsAgainst += sh;
           if (sh > sa) {
             homeTeam.points += 3;
+            homeTeam.wins++;
+            awayTeam.losses++;
           } else if (sh < sa) {
             awayTeam.points += 3;
+            awayTeam.wins++;
+            homeTeam.losses++;
           } else {
             homeTeam.points += 1;
             awayTeam.points += 1;
+            homeTeam.draws++;
+            awayTeam.draws++;
           }
         }
       });
@@ -3159,7 +3404,102 @@
       } catch (e) { }
     })();
 
-    function render() { renderStats(); renderTabs(); renderMatches(); }
+    const GROUP_KEYS = Object.keys(GROUPS); // ['A','B','C','D','E','F','G','H','I','J','K','L']
+    let currentGroupIdx = 0;
+
+    window.standingsNav = function (dir) {
+      currentGroupIdx = (currentGroupIdx + dir + GROUP_KEYS.length) % GROUP_KEYS.length;
+      renderStandings();
+    };
+
+    window.standingsGoTo = function (idx) {
+      currentGroupIdx = idx;
+      renderStandings();
+    };
+
+    function renderStandings() {
+      const el = document.getElementById('standingsSection');
+      if (!el) return;
+      if (mode !== 'tracker') { el.innerHTML = ''; return; }
+
+      const standings = getGroupStandings();
+      const g = GROUP_KEYS[currentGroupIdx];
+      const teams = standings[g];
+      const groupTeamNames = GROUPS[g].join(' · ');
+
+      let rows = '';
+      teams.forEach((t, i) => {
+        const zoneClass = i === 0 ? 'zone-q1' : i === 1 ? 'zone-q2' : i === 2 ? 'zone-q3' : 'zone-elim';
+        const posClass = `spos-${i + 1}`;
+        const gd = t.goalDiff;
+        const gdStr = gd > 0 ? '+' + gd : String(gd);
+        const gdCls = gd > 0 ? 'pos' : gd < 0 ? 'neg' : '';
+        rows += `
+          <tr class="${zoneClass}">
+            <td class="td-team">
+              <div class="s-team-cell">
+                <span class="spos ${posClass}">${i + 1}</span>
+                ${flagHTML(t.name)}
+                <span>${t.name}</span>
+              </div>
+            </td>
+            <td>${t.played}</td>
+            <td>${t.wins}</td>
+            <td>${t.draws}</td>
+            <td>${t.losses}</td>
+            <td>${t.goalsFor}</td>
+            <td>${t.goalsAgainst}</td>
+            <td><span class="s-gd ${gdCls}">${gdStr}</span></td>
+            <td><span class="s-pts">${t.points}</span></td>
+          </tr>`;
+      });
+
+      const dots = GROUP_KEYS.map((k, i) =>
+        `<div class="standings-dot ${i === currentGroupIdx ? 'active' : ''}" onclick="standingsGoTo(${i})" title="Group ${k}"></div>`
+      ).join('');
+
+      el.innerHTML = `
+        <div class="standings-shell">
+          <div class="standings-header">
+            <button class="standings-nav-btn" onclick="standingsNav(-1)" aria-label="Previous group">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+            </button>
+            <div class="standings-title-block">
+              <div class="standings-group-name">Group ${g}</div>
+              <div class="standings-group-teams">${groupTeamNames}</div>
+            </div>
+            <button class="standings-nav-btn" onclick="standingsNav(1)" aria-label="Next group">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+            </button>
+          </div>
+          <div style="overflow-x:auto">
+            <table class="standings-table" role="table" aria-label="Group ${g} standings">
+              <thead>
+                <tr>
+                  <th class="th-team">Team</th>
+                  <th title="Played">P</th>
+                  <th title="Wins">W</th>
+                  <th title="Draws">D</th>
+                  <th title="Losses">L</th>
+                  <th title="Goals For">GF</th>
+                  <th title="Goals Against">GA</th>
+                  <th title="Goal Difference">GD</th>
+                  <th title="Points">Pts</th>
+                </tr>
+              </thead>
+              <tbody>${rows}</tbody>
+            </table>
+          </div>
+          <div class="standings-dots" role="tablist" aria-label="Select group">${dots}</div>
+          <div class="standings-legend">
+            <div class="legend-item"><div class="legend-dot q"></div>Qualify (Top 2)</div>
+            <div class="legend-item"><div class="legend-dot m"></div>Potential 3rd</div>
+            <div class="legend-item"><div class="legend-dot e"></div>Eliminated</div>
+          </div>
+        </div>`;
+    }
+
+    function render() { renderStats(); renderTabs(); renderStandings(); renderMatches(); }
     render();
     updateLiveStatus();
     fetchLive();
