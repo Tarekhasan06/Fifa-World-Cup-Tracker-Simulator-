@@ -2741,7 +2741,7 @@
       const bracket = computeKnockoutBracket();
 
       // Left side matches
-      const left_r32 = ['r1', 'r4', 'r3', 'r5', 'r2', 'r6', 'r7', 'r8'];
+      const left_r32 = ['r1', 'r4', 'r3', 'r5', 'r2', 'r6', 'r7', 'r13'];
       const left_r16 = ['x2', 'x1', 'x3', 'x4'];
       const left_qf = ['q1', 'q2'];
       const left_sf = ['s1'];
@@ -2750,7 +2750,7 @@
       const right_sf = ['s2'];
       const right_qf = ['q3', 'q4'];
       const right_r16 = ['x5', 'x6', 'x7', 'x8'];
-      const right_r32 = ['r11', 'r12', 'r9', 'r10', 'r14', 'r16', 'r13', 'r15'];
+      const right_r32 = ['r11', 'r12', 'r9', 'r10', 'r14', 'r16', 'r8', 'r15'];
 
       let html = `
     <div class="bracket-wrapper">
@@ -3134,11 +3134,11 @@
       bracket.x1 = { home: win('r3'), away: win('r5'), homeMeta: 'Win r3', awayMeta: 'Win r5' };
       bracket.x2 = { home: win('r1'), away: win('r4'), homeMeta: 'Win r1', awayMeta: 'Win r4' };
       bracket.x3 = { home: win('r2'), away: win('r6'), homeMeta: 'Win r2', awayMeta: 'Win r6' };
-      bracket.x4 = { home: win('r7'), away: win('r8'), homeMeta: 'Win r7', awayMeta: 'Win r8' };
+      bracket.x4 = { home: win('r7'), away: win('r13'), homeMeta: 'Win r7', awayMeta: 'Win r13' };
       bracket.x5 = { home: win('r11'), away: win('r12'), homeMeta: 'Win r11', awayMeta: 'Win r12' };
       bracket.x6 = { home: win('r9'), away: win('r10'), homeMeta: 'Win r9', awayMeta: 'Win r10' };
       bracket.x7 = { home: win('r14'), away: win('r16'), homeMeta: 'Win r14', awayMeta: 'Win r16' };
-      bracket.x8 = { home: win('r13'), away: win('r15'), homeMeta: 'Win r13', awayMeta: 'Win r15' };
+      bracket.x8 = { home: win('r8'), away: win('r15'), homeMeta: 'Win r8', awayMeta: 'Win r15' };
 
       bracket.q1 = { home: win('x1'), away: win('x2'), homeMeta: 'Win x1', awayMeta: 'Win x2' };
       bracket.q2 = { home: win('x3'), away: win('x4'), homeMeta: 'Win x3', awayMeta: 'Win x4' };
