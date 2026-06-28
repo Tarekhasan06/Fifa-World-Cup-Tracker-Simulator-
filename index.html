@@ -2741,7 +2741,7 @@
       const bracket = computeKnockoutBracket();
 
       // Left side matches
-      const left_r32 = ['r1', 'r4', 'r3', 'r5', 'r2', 'r6', 'r7', 'r13'];
+      const left_r32 = ['r1', 'r4', 'r3', 'r5', 'r16', 'r13', 'r8', 'r9'];
       const left_r16 = ['x2', 'x1', 'x3', 'x4'];
       const left_qf = ['q1', 'q2'];
       const left_sf = ['s1'];
@@ -2750,7 +2750,7 @@
       const right_sf = ['s2'];
       const right_qf = ['q3', 'q4'];
       const right_r16 = ['x5', 'x6', 'x7', 'x8'];
-      const right_r32 = ['r11', 'r12', 'r9', 'r10', 'r14', 'r16', 'r8', 'r15'];
+      const right_r32 = ['r2', 'r7', 'r6', 'r10', 'r14', 'r11', 'r12', 'r15'];
 
       let html = `
     <div class="bracket-wrapper">
@@ -2924,12 +2924,11 @@
         predictorState.best3rd.push('');
       }
 
-      // 3rd-place slot assignments (8 best 3rd-place teams → specific R32 matches):
-      // r2-away: F3 (Japan), r3-away: D3 (Paraguay), r6-away: E3 (Ecuador),
-      // r8-away: B3 (Bosnia), r9-away: I3 (Senegal), r10-away: K3 (DR Congo),
-      // r11-away: J3 (Algeria), r16-away: L3 (Ghana)
+      // 3rd-place slot assignments per FIFA 2026 Annex C (8 best 3rd-place teams → R32):
+      // M74 r3=3rd, M77 r5=3rd, M79 r6=3rd, M80 r10=3rd,
+      // M81 r8=3rd, M82 r9=3rd, M85 r11=3rd, M87 r12=3rd
       const assigned = {};
-      const slots = ['r2', 'r3', 'r6', 'r8', 'r9', 'r10', 'r11', 'r16'];
+      const slots = ['r5', 'r3', 'r6', 'r8', 'r9', 'r10', 'r11', 'r12'];
       slots.forEach((sId, idx) => {
         const g = predictorState.best3rd[idx];
         assigned[sId] = { group: g || '', team: g ? p[g + '3'] : '' };
@@ -2943,21 +2942,21 @@
 
       return {
         r1:  { home: p['A2'] || 'Runner-up A', away: p['B2'] || 'Runner-up B',  homeMeta: 'A2', awayMeta: 'B2' },
-        r2:  { home: p['C1'] || 'Winner C',    away: slot('r2').team,            homeMeta: 'C1', awayMeta: slot('r2').meta },
+        r2:  { home: p['C1'] || 'Winner C',    away: p['F2'] || 'Runner-up F',  homeMeta: 'C1', awayMeta: 'F2' },
         r3:  { home: p['E1'] || 'Winner E',    away: slot('r3').team,            homeMeta: 'E1', awayMeta: slot('r3').meta },
         r4:  { home: p['F1'] || 'Winner F',    away: p['C2'] || 'Runner-up C',   homeMeta: 'F1', awayMeta: 'C2' },
-        r5:  { home: p['I1'] || 'Winner I',    away: p['F2'] || 'Runner-up F',   homeMeta: 'I1', awayMeta: 'F2' },
+        r5:  { home: p['I1'] || 'Winner I',    away: slot('r5').team,            homeMeta: 'I1', awayMeta: slot('r5').meta },
         r6:  { home: p['A1'] || 'Winner A',    away: slot('r6').team,            homeMeta: 'A1', awayMeta: slot('r6').meta },
         r7:  { home: p['E2'] || 'Runner-up E', away: p['I2'] || 'Runner-up I',   homeMeta: 'E2', awayMeta: 'I2' },
         r8:  { home: p['D1'] || 'Winner D',    away: slot('r8').team,            homeMeta: 'D1', awayMeta: slot('r8').meta },
         r9:  { home: p['G1'] || 'Winner G',    away: slot('r9').team,            homeMeta: 'G1', awayMeta: slot('r9').meta },
         r10: { home: p['L1'] || 'Winner L',    away: slot('r10').team,           homeMeta: 'L1', awayMeta: slot('r10').meta },
         r11: { home: p['B1'] || 'Winner B',    away: slot('r11').team,           homeMeta: 'B1', awayMeta: slot('r11').meta },
-        r12: { home: p['K1'] || 'Winner K',    away: p['L2'] || 'Runner-up L',   homeMeta: 'K1', awayMeta: 'L2' },
+        r12: { home: p['K1'] || 'Winner K',    away: slot('r12').team,           homeMeta: 'K1', awayMeta: slot('r12').meta },
         r13: { home: p['H1'] || 'Winner H',    away: p['J2'] || 'Runner-up J',   homeMeta: 'H1', awayMeta: 'J2' },
         r14: { home: p['J1'] || 'Winner J',    away: p['H2'] || 'Runner-up H',   homeMeta: 'J1', awayMeta: 'H2' },
         r15: { home: p['D2'] || 'Runner-up D', away: p['G2'] || 'Runner-up G',  homeMeta: 'D2', awayMeta: 'G2' },
-        r16: { home: p['K2'] || 'Runner-up K', away: slot('r16').team,           homeMeta: 'K2', awayMeta: slot('r16').meta }
+        r16: { home: p['K2'] || 'Runner-up K', away: p['L2'] || 'Runner-up L',  homeMeta: 'K2', awayMeta: 'L2' }
       };
     }
 
@@ -3056,12 +3055,11 @@
         p[g + '3'] = standings[g] && standings[g][2] ? standings[g][2].name : '';
       });
 
-      // 3rd-place slot assignments (8 best 3rd-place teams → specific R32 matches):
-      // r2-away: F3 (Japan), r3-away: D3 (Paraguay), r6-away: E3 (Ecuador),
-      // r8-away: B3 (Bosnia), r9-away: I3 (Senegal), r10-away: K3 (DR Congo),
-      // r11-away: J3 (Algeria), r16-away: L3 (Ghana)
+      // 3rd-place slot assignments per FIFA 2026 Annex C (8 best 3rd-place teams → R32):
+      // M74 r3=3rd, M77 r5=3rd, M79 r6=3rd, M80 r10=3rd,
+      // M81 r8=3rd, M82 r9=3rd, M85 r11=3rd, M87 r12=3rd
       const assigned = {};
-      const slots = ['r2', 'r3', 'r6', 'r8', 'r9', 'r10', 'r11', 'r16'];
+      const slots = ['r5', 'r3', 'r6', 'r8', 'r9', 'r10', 'r11', 'r12'];
       slots.forEach((sId, idx) => {
         const g = best3rd[idx];
         assigned[sId] = { group: g || '', team: g ? p[g + '3'] : '' };
@@ -3075,21 +3073,21 @@
 
       return {
         r1:  { home: p['A2'] || 'Runner-up A', away: p['B2'] || 'Runner-up B',  homeMeta: 'A2', awayMeta: 'B2' },
-        r2:  { home: p['C1'] || 'Winner C',    away: slot('r2').team,            homeMeta: 'C1', awayMeta: slot('r2').meta },
+        r2:  { home: p['C1'] || 'Winner C',    away: p['F2'] || 'Runner-up F',  homeMeta: 'C1', awayMeta: 'F2' },
         r3:  { home: p['E1'] || 'Winner E',    away: slot('r3').team,            homeMeta: 'E1', awayMeta: slot('r3').meta },
         r4:  { home: p['F1'] || 'Winner F',    away: p['C2'] || 'Runner-up C',   homeMeta: 'F1', awayMeta: 'C2' },
-        r5:  { home: p['I1'] || 'Winner I',    away: p['F2'] || 'Runner-up F',   homeMeta: 'I1', awayMeta: 'F2' },
+        r5:  { home: p['I1'] || 'Winner I',    away: slot('r5').team,            homeMeta: 'I1', awayMeta: slot('r5').meta },
         r6:  { home: p['A1'] || 'Winner A',    away: slot('r6').team,            homeMeta: 'A1', awayMeta: slot('r6').meta },
         r7:  { home: p['E2'] || 'Runner-up E', away: p['I2'] || 'Runner-up I',   homeMeta: 'E2', awayMeta: 'I2' },
         r8:  { home: p['D1'] || 'Winner D',    away: slot('r8').team,            homeMeta: 'D1', awayMeta: slot('r8').meta },
         r9:  { home: p['G1'] || 'Winner G',    away: slot('r9').team,            homeMeta: 'G1', awayMeta: slot('r9').meta },
         r10: { home: p['L1'] || 'Winner L',    away: slot('r10').team,           homeMeta: 'L1', awayMeta: slot('r10').meta },
         r11: { home: p['B1'] || 'Winner B',    away: slot('r11').team,           homeMeta: 'B1', awayMeta: slot('r11').meta },
-        r12: { home: p['K1'] || 'Winner K',    away: p['L2'] || 'Runner-up L',   homeMeta: 'K1', awayMeta: 'L2' },
+        r12: { home: p['K1'] || 'Winner K',    away: slot('r12').team,           homeMeta: 'K1', awayMeta: slot('r12').meta },
         r13: { home: p['H1'] || 'Winner H',    away: p['J2'] || 'Runner-up J',   homeMeta: 'H1', awayMeta: 'J2' },
         r14: { home: p['J1'] || 'Winner J',    away: p['H2'] || 'Runner-up H',   homeMeta: 'J1', awayMeta: 'H2' },
         r15: { home: p['D2'] || 'Runner-up D', away: p['G2'] || 'Runner-up G',  homeMeta: 'D2', awayMeta: 'G2' },
-        r16: { home: p['K2'] || 'Runner-up K', away: slot('r16').team,           homeMeta: 'K2', awayMeta: slot('r16').meta }
+        r16: { home: p['K2'] || 'Runner-up K', away: p['L2'] || 'Runner-up L',  homeMeta: 'K2', awayMeta: 'L2' }
       };
     }
 
@@ -3131,14 +3129,14 @@
       };
       const bracket = { ...r32 };
 
-      bracket.x1 = { home: win('r3'), away: win('r5'), homeMeta: 'Win r3', awayMeta: 'Win r5' };
-      bracket.x2 = { home: win('r1'), away: win('r4'), homeMeta: 'Win r1', awayMeta: 'Win r4' };
-      bracket.x3 = { home: win('r2'), away: win('r6'), homeMeta: 'Win r2', awayMeta: 'Win r6' };
-      bracket.x4 = { home: win('r7'), away: win('r13'), homeMeta: 'Win r7', awayMeta: 'Win r13' };
-      bracket.x5 = { home: win('r11'), away: win('r12'), homeMeta: 'Win r11', awayMeta: 'Win r12' };
-      bracket.x6 = { home: win('r9'), away: win('r10'), homeMeta: 'Win r9', awayMeta: 'Win r10' };
-      bracket.x7 = { home: win('r14'), away: win('r16'), homeMeta: 'Win r14', awayMeta: 'Win r16' };
-      bracket.x8 = { home: win('r8'), away: win('r15'), homeMeta: 'Win r8', awayMeta: 'Win r15' };
+      bracket.x1 = { home: win('r3'),  away: win('r5'),  homeMeta: 'Win r3',  awayMeta: 'Win r5' };
+      bracket.x2 = { home: win('r1'),  away: win('r4'),  homeMeta: 'Win r1',  awayMeta: 'Win r4' };
+      bracket.x3 = { home: win('r16'), away: win('r13'), homeMeta: 'Win r16', awayMeta: 'Win r13' };
+      bracket.x4 = { home: win('r8'),  away: win('r9'),  homeMeta: 'Win r8',  awayMeta: 'Win r9' };
+      bracket.x5 = { home: win('r2'),  away: win('r7'),  homeMeta: 'Win r2',  awayMeta: 'Win r7' };
+      bracket.x6 = { home: win('r6'),  away: win('r10'), homeMeta: 'Win r6',  awayMeta: 'Win r10' };
+      bracket.x7 = { home: win('r14'), away: win('r11'), homeMeta: 'Win r14', awayMeta: 'Win r11' };
+      bracket.x8 = { home: win('r12'), away: win('r15'), homeMeta: 'Win r12', awayMeta: 'Win r15' };
 
       bracket.q1 = { home: win('x1'), away: win('x2'), homeMeta: 'Win x1', awayMeta: 'Win x2' };
       bracket.q2 = { home: win('x3'), away: win('x4'), homeMeta: 'Win x3', awayMeta: 'Win x4' };
